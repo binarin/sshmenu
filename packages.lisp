@@ -1,2 +1,2 @@
 (defpackage :ru.binarin.sshmenu
-  (:use cl iterate))
+  (:use cl iterate anaphora))
