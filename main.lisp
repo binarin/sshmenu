@@ -42,12 +42,18 @@
 (defmethod shell-command ((r remote-shell) (mux (eql 'screen)) args)
   (list "screen" "-D" "-RR" "-h" "20000" "-S" "binarin"))
 
+(defun raise-by-title (title)
+  (let ((pid (sb-ext:run-program "/usr/bin/wmctrl" (list "-F" "-a" title)
+                                 :wait t :input nil :output nil)))
+    (= 0 (sb-ext:process-exit-code pid))))
+
 (defmethod click ((r remote-shell))
-  (let ((cmd (shell-command r (terminal r)
-                            (shell-command r (rsh r)
-                                           (shell-command r (mux r) nil)))))
-    (sb-ext:run-program (car cmd) (cdr cmd)
-                        :wait nil :input nil :output nil)))
+  (unless (raise-by-title (full-title r "|" "SSH"))
+    (let ((cmd (shell-command r (terminal r)
+                              (shell-command r (rsh r)
+                                             (shell-command r (mux r) nil)))))
+        (sb-ext:run-program (car cmd) (cdr cmd)
+                            :wait nil :input nil :output nil))))
 
 (defmethod click ((menu menu))
   (let* ((output (make-string-output-stream))
