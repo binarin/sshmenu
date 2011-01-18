@@ -71,4 +71,8 @@
                      :entries (mapcar 'prepare-menu (cdr item)))
       (apply 'make-instance 'remote-shell :title (car item) (cdr item))))
 
+(defun read-menu (path)
+  (with-open-file (f path)
+    (prepare-menu (read f))))
+
 
