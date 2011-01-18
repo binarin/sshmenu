@@ -32,7 +32,9 @@
 
 (defmethod shell-command ((r remote-shell) (term (eql 'rxvt-unicode)) args)
   (declare (ignore term))
-  (list* "/usr/bin/rxvt-unicode" "-T" (full-title r "|" "SSH") "-e" args))
+  (list* "/usr/bin/rxvt-unicode"
+         "-pixmap" (concatenate 'string "/home/binarin/ssh/images/" (tile r))
+         "-T" (full-title r "|" "SSH") "-e" args))
 
 (defmethod shell-command ((r remote-shell) (rsh (eql 'ssh)) args)
   (if args
