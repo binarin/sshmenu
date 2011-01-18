@@ -8,6 +8,7 @@
   ((host :initarg :host :accessor host)
    (login :initarg :login :accessor login)
    (bgcolor :initarg :bgcolor :accessor bgcolor)
+   (tile :initarg :tile :accessor tile)
    (terminal :initarg :terminal :accessor terminal :initform 'rxvt-unicode)
    (rsh :initarg :rsh :accessor rsh :initform 'ssh)
    (mux :initarg :mux :accessor mux :initform 'screen)))
@@ -84,4 +85,10 @@
        :host "ishamael.binarin.ru" :login "binarin"
        :bgcolor "darkred" :rsh ssh :mux screen
        ))))
+(defun prepare-menu (item)
+  (if (listp (second item))
+      (make-instance 'menu :title (car item)
+                     :entries (mapcar 'prepare-menu (cdr item)))
+      (apply 'make-instance 'remote-shell :title (car item) (cdr item))))
+
 
