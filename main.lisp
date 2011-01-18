@@ -36,8 +36,8 @@
 
 (defmethod shell-command ((r remote-shell) (rsh (eql 'ssh)) args)
   (if args
-      (list* "ssh" (host r) "-t" args)
-      (list* "ssh" (host r))))
+      (list* "ssh" "-l" (login r) (host r) "-t" args)
+      (list* "ssh" "-l" (login r) (host r))))
 
 (defmethod shell-command ((r remote-shell) (mux (eql 'screen)) args)
   (list "screen" "-D" "-RR" "-h" "20000" "-S" "binarin"))
