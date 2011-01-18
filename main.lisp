@@ -65,26 +65,6 @@
                     (1- (read (make-string-input-stream (get-output-stream-string output)))))
           (click it)))))
 
-(defparameter *root-menu*
-  (make-instance
-   'menu :title "Root"
-   :entries (list
-             (make-instance
-              'menu :title "Home"
-              :entries (list (make-instance 'remote-shell
-                                            :title "vassago"
-                                            :host "vassago.binarin.ru")
-                             (make-instance 'item :title "ishamael")))
-             (make-instance 'item :title "Терминал"))))
-
-(defparameter *menu*
-   '(("terminal" :type rsh :rsh nil)
-     ("home"
-      ("ishamael rdp" :type rdp :host "10.8.0.1")
-      ("ishamael" :type rsh
-       :host "ishamael.binarin.ru" :login "binarin"
-       :bgcolor "darkred" :rsh ssh :mux screen
-       ))))
 (defun prepare-menu (item)
   (if (listp (second item))
       (make-instance 'menu :title (car item)
