@@ -83,4 +83,60 @@
   (with-open-file (f path)
     (prepare-menu (read f))))
 
+(defun menu-entries-store (menu)
+  (let ((model (make-instance 'gtk:array-list-store)))
+    ;; hotkey
+    (gtk:store-add-column model "gchararray"
+                          (lambda (item) (second item)))
+    ;; item title
+    (gtk:store-add-column model "gchararray"
+                          (lambda (item) (format nil "~A" (title (first item)))))
+    ;; arrow for submenus
+    (gtk:store-add-column model "gchararray"
+                          (lambda (item) (if (typep (first item) 'menu) "▶" "")))
+
+    (iterate (for i from 1)
+             (for entry in (entries menu))
+             (gtk:store-add-item model
+                                 (list entry (format nil "~A" i))))
+    model))
+
+
+(defun make-selector-window (menu)
+  (let ((output *standard-output*))
+    (declare (ignore output))
+    (gtk:with-main-loop
+      (let* ((window (make-instance 'gtk:gtk-window
+                                    :window-position :center
+                                    :title (title menu)
+                                    :default-width 10
+                                    :default-height 10))
+             (items-model (menu-entries-store menu))
+             (items-list (make-instance 'gtk:tree-view :model items-model)))
+        (let ((col (make-instance 'gtk:tree-view-column :title "Hotkey"))
+              (cr (make-instance 'gtk:cell-renderer-text)))
+          (gtk:tree-view-column-pack-start col cr)
+          (gtk:tree-view-column-add-attribute col cr "text" 0)
+          (gtk:tree-view-append-column items-list col))
+        (let ((col (make-instance 'gtk:tree-view-column :title "Title"))
+              (cr (make-instance 'gtk:cell-renderer-text)))
+          (gtk:tree-view-column-pack-start col cr)
+          (gtk:tree-view-column-add-attribute col cr "text" 1)
+          (gtk:tree-view-append-column items-list col))
+        (let ((col (make-instance 'gtk:tree-view-column :title "Submenu"))
+              (cr (make-instance 'gtk:cell-renderer-text)))
+          (gtk:tree-view-column-pack-start col cr)
+          (gtk:tree-view-column-add-attribute col cr "text" 2)
+          (gtk:tree-view-append-column items-list col))
+        (setf (gtk:tree-view-headers-visible items-list) nil)
+        (gtk:container-add window items-list)
+        (gtk:widget-show window)
+        ))))
+
+(defun select-from-list (m)
+  (gtk:with-main-loop
+    (let ((window (make-instance 'gtk:gtk-window
+                                 :title (title m)
+                                 :type :toplevel)))
+      (gtk:widget-show window))))
 
