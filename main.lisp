@@ -101,10 +101,11 @@
                                  (list entry (format nil "~A" i))))
     model))
 
+(defvar *current-menu* nil)
 
 (defun make-selector-window (menu)
   (let ((output *standard-output*))
-    (declare (ignore output))
+    (declare (ignorable output))
     (gtk:with-main-loop
       (let* ((window (make-instance 'gtk:gtk-window
                                     :window-position :center
@@ -113,6 +114,9 @@
                                     :default-height 10))
              (items-model (menu-entries-store menu))
              (items-list (make-instance 'gtk:tree-view :model items-model)))
+        (when *current-menu*
+          (gtk:object-destroy *current-menu*))
+        (setf *current-menu* window)
         (let ((col (make-instance 'gtk:tree-view-column :title "Hotkey"))
               (cr (make-instance 'gtk:cell-renderer-text)))
           (gtk:tree-view-column-pack-start col cr)
