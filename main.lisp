@@ -134,8 +134,13 @@
           (gtk:tree-view-append-column items-list col))
         (setf (gtk:tree-view-headers-visible items-list) nil)
         (gtk:container-add window items-list)
-        (gtk:widget-show window)
-        ))))
+        (gobject:g-signal-connect
+         items-list "row-activated"
+         (lambda (tree-view path column)
+           (declare (ignorable tree-view column))
+           (format output "~A"
+                   (gtk:tree-path-indices path))))
+        (gtk:widget-show window)))))
 
 (defun select-from-list (m)
   (gtk:with-main-loop
