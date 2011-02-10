@@ -155,3 +155,14 @@
                                  :type :toplevel)))
       (gtk:widget-show window))))
 
+(defun global-bind ()
+  (let ((output *standard-output*))
+    (declare (ignorable output))
+    (gtk:within-main-loop
+      (keybinder:init)
+      (keybinder:bind
+       "<Super>grave"
+       (lambda (keystring)
+         (let ((menu (read-menu #p"/home/binarin/.sshmenu-cl")))
+           (click menu)))))))
+
