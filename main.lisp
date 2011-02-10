@@ -58,20 +58,7 @@
                             :wait nil :input nil :output nil))))
 
 (defmethod click ((menu menu))
-  (let* ((output (make-string-output-stream))
-         (input (make-string-input-stream
-                 (format nil "~{~A~A~A~%~}"
-                         (iterate (for el in (entries menu))
-                                  (for i from 1)
-                                  (appending (list i #\Tab (title el)))))))
-         (proc (sb-ext:run-program
-                "/usr/bin/zenity"
-                (list "--list" "--column" "a")
-                :input input :output output :wait t)))
-    (if (= 0 (sb-ext:process-exit-code proc))
-        (awhen (elt (entries menu)
-                    (1- (read (make-string-input-stream (get-output-stream-string output)))))
-          (click it)))))
+  (make-selector-window menu))
 
 (defun prepare-menu (item)
   (if (listp (second item))
@@ -144,8 +131,10 @@
          items-list "row-activated"
          (lambda (tree-view path column)
            (declare (ignorable tree-view column))
-           (format output "~A"
-                   (gtk:tree-path-indices path))))
+           (gtk:object-destroy *current-menu*)
+           (setf *current-menu* nil)
+           (click (elt (entries menu)
+                       (first (gtk:tree-path-indices path))))))
         (gtk:widget-show window)))))
 
 (defun select-from-list (m)
