@@ -101,7 +101,29 @@
                                  (list entry (format nil "~A" i))))
     model))
 
+(defun make-menu-view (model)
+  (let* ((items-list (make-instance 'gtk:tree-view :model model)))
+    (let ((col (make-instance 'gtk:tree-view-column :title "Hotkey"))
+          (cr (make-instance 'gtk:cell-renderer-text)))
+      (gtk:tree-view-column-pack-start col cr)
+      (gtk:tree-view-column-add-attribute col cr "text" 0)
+      (gtk:tree-view-append-column items-list col))
+    (let ((col (make-instance 'gtk:tree-view-column :title "Title"))
+          (cr (make-instance 'gtk:cell-renderer-text)))
+      (gtk:tree-view-column-pack-start col cr)
+      (gtk:tree-view-column-add-attribute col cr "text" 1)
+      (gtk:tree-view-append-column items-list col))
+    (let ((col (make-instance 'gtk:tree-view-column :title "Submenu"))
+          (cr (make-instance 'gtk:cell-renderer-text)))
+      (gtk:tree-view-column-pack-start col cr)
+      (gtk:tree-view-column-add-attribute col cr "text" 2)
+      (gtk:tree-view-append-column items-list col))
+    (setf (gtk:tree-view-headers-visible items-list) nil)
+    items-list))
+
+
 (defvar *current-menu* nil)
+
 
 (defun make-selector-window (menu)
   (let ((output *standard-output*))
@@ -113,26 +135,10 @@
                                     :default-width 10
                                     :default-height 10))
              (items-model (menu-entries-store menu))
-             (items-list (make-instance 'gtk:tree-view :model items-model)))
+             (items-list (make-menu-view items-model)))
         (when *current-menu*
           (gtk:object-destroy *current-menu*))
         (setf *current-menu* window)
-        (let ((col (make-instance 'gtk:tree-view-column :title "Hotkey"))
-              (cr (make-instance 'gtk:cell-renderer-text)))
-          (gtk:tree-view-column-pack-start col cr)
-          (gtk:tree-view-column-add-attribute col cr "text" 0)
-          (gtk:tree-view-append-column items-list col))
-        (let ((col (make-instance 'gtk:tree-view-column :title "Title"))
-              (cr (make-instance 'gtk:cell-renderer-text)))
-          (gtk:tree-view-column-pack-start col cr)
-          (gtk:tree-view-column-add-attribute col cr "text" 1)
-          (gtk:tree-view-append-column items-list col))
-        (let ((col (make-instance 'gtk:tree-view-column :title "Submenu"))
-              (cr (make-instance 'gtk:cell-renderer-text)))
-          (gtk:tree-view-column-pack-start col cr)
-          (gtk:tree-view-column-add-attribute col cr "text" 2)
-          (gtk:tree-view-append-column items-list col))
-        (setf (gtk:tree-view-headers-visible items-list) nil)
         (gtk:container-add window items-list)
         (gobject:g-signal-connect
          items-list "row-activated"
