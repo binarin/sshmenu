@@ -4,6 +4,9 @@
   ((title :initarg :title :reader title)
    (parent :initarg :parent :reader parent :initform nil)))
 
+(defclass local-shell (item)
+  ())
+
 (defclass remote-shell (item)
   ((host :initarg :host :accessor host)
    (login :initarg :login :accessor login)
@@ -19,6 +22,8 @@
 
 (defmethod initialize-instance :after ((menu menu) &rest initargs &key &allow-other-keys)
   (declare (ignore initargs))
+  (setf (entries menu) (mapcar (lambda (item) (apply 'make-instance item))
+                               (entries menu)))
   (mapc #'(lambda (item) (setf (slot-value item 'parent) menu))
         (entries menu)))
 
@@ -61,10 +66,7 @@
   (make-selector-window menu))
 
 (defun prepare-menu (item)
-  (if (listp (second item))
-      (make-instance 'menu :title (car item)
-                     :entries (mapcar 'prepare-menu (cdr item)))
-      (apply 'make-instance 'remote-shell :title (car item) (cdr item))))
+      (apply 'make-instance item))
 
 (defun read-menu (path)
   (with-open-file (f path)
