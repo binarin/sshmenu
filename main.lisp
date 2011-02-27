@@ -27,19 +27,29 @@
   (mapc #'(lambda (item) (setf (slot-value item 'parent) menu))
         (entries menu)))
 
-(defmethod full-title ((i item) separator type)
+(defmethod visible-type ((item item))
+  (symbol-name (type-of item)))
+
+(defmethod visible-type ((item local-shell))
+  "LOCAL")
+
+(defmethod visible-type ((item remote-shell))
+  "SSH")
+
+(defmethod full-title ((i item) separator)
   "Возвращает полное имя элемента меню (начиная от корня)"
   (format nil
           "~{~A~^|~}"
-          (cons type (cdr (reverse (iter (for cur initially i then (parent cur))
-                                         (while cur)
-                                         (collect (title cur))))))))
+          (cons (visible-type i)
+                (cdr (reverse (iter (for cur initially i then (parent cur))
+                                    (while cur)
+                                    (collect (title cur))))))))
 
 (defmethod shell-command ((r remote-shell) (term (eql 'rxvt-unicode)) args)
   (declare (ignore term))
   (list* "/usr/bin/rxvt-unicode"
          "-pixmap" (concatenate 'string "/home/binarin/ssh/images/" (tile r) ";0x0+50+50:tile")
-         "-T" (full-title r "|" "SSH") "-e" args))
+         "-T" (full-title r "|") "-e" args))
 
 (defmethod shell-command ((r remote-shell) (rsh (eql 'ssh)) args)
   (if args
@@ -55,7 +65,7 @@
     (= 0 (sb-ext:process-exit-code pid))))
 
 (defmethod click ((r remote-shell))
-  (unless (raise-by-title (full-title r "|" "SSH"))
+  (unless (raise-by-title (full-title r "|"))
     (let ((cmd (shell-command r (terminal r)
                               (shell-command r (rsh r)
                                              (shell-command r (mux r) nil)))))
