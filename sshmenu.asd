@@ -4,4 +4,5 @@
   :depends-on ("anaphora" "iterate" "cl-gtk2-gtk" "keybinder")
   :components
   ((:file "packages")
-   (:file "main" :depends-on ("packages"))))
+   (:file "terminal" :depends-on ("packages"))
+   (:file "main" :depends-on ("packages" "terminal"))))
