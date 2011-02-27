@@ -152,6 +152,7 @@
       (keybinder:bind
        "<Super>grave"
        (lambda (keystring)
-         (let ((menu (read-menu #p"/home/binarin/.sshmenu-cl")))
+         (declare (ignorable keystring))
+         (let ((menu (read-menu #p"/home/binarin/sshmenu/.sample-menu")))
            (click menu)))))))
 

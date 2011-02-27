@@ -1,0 +1,11 @@
+(menu
+ :title "root"
+ :entries
+ ((local-shell :title "local shell")
+  (menu
+   :title "Home"
+   :entries
+   ((remote-shell :title "host1" :host "172.25.14.1" :login "binarin" :tile "dgren002.jpg")
+    (remote-shell :title "host2" :host "172.25.14.4" :login "binarin" :tile "dgren003.jpg")))))
+
+
