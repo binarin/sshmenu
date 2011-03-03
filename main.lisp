@@ -166,14 +166,15 @@
       (gtk:widget-show window))))
 
 (defun global-bind ()
+  (initialize-settings)
   (let ((output *standard-output*))
     (declare (ignorable output))
     (gtk:within-main-loop
       (keybinder:init)
       (keybinder:bind
-       "<Super>grave"
+       (setting "global-key")
        (lambda (keystring)
          (declare (ignorable keystring))
-         (let ((menu (read-menu #p"/home/binarin/sshmenu/.sample-menu")))
+         (let ((menu (read-menu (setting "menu-file"))))
            (click menu)))))))
 
