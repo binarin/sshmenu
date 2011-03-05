@@ -132,31 +132,44 @@
 
 (defvar *current-menu* nil)
 
+(defvar output *standard-output*)
+(defvar event)
 
 (defun make-selector-window (menu)
-  (let ((output *standard-output*))
-    (declare (ignorable output))
-    (gtk:with-main-loop
-      (let* ((window (make-instance 'gtk:gtk-window
-                                    :window-position :center
-                                    :title (title menu)
-                                    :default-width 10
-                                    :default-height 10))
-             (items-model (menu-entries-store menu))
-             (items-list (make-menu-view items-model)))
-        (when *current-menu*
-          (gtk:object-destroy *current-menu*))
-        (setf *current-menu* window)
-        (gtk:container-add window items-list)
-        (gobject:g-signal-connect
-         items-list "row-activated"
-         (lambda (tree-view path column)
-           (declare (ignorable tree-view column))
-           (gtk:object-destroy *current-menu*)
-           (setf *current-menu* nil)
-           (click (elt (entries menu)
-                       (first (gtk:tree-path-indices path))))))
-        (gtk:widget-show window)))))
+  (gtk:with-main-loop
+    (let* ((window (make-instance 'gtk:gtk-window
+                                  :window-position :center
+                                  :title (title menu)
+                                  :default-width 10
+                                  :default-height 10))
+           (items-model (menu-entries-store menu))
+           (items-list (make-menu-view items-model)))
+      (when *current-menu*
+        (gtk:object-destroy *current-menu*))
+      (setf *current-menu* window)
+      (gtk:container-add window items-list)
+      (gobject:g-signal-connect
+       items-list "key-press-event"
+       (lambda (w e)
+         (declare (ignorable w e))
+         (when (null (gdk:event-key-state e))
+           (awhen (parse-integer (gdk:event-key-string e) :junk-allowed t)
+             (when (and (<= 1 it 9)
+                        (<= 1 it (length (entries menu))))
+               (gtk:object-destroy *current-menu*)
+               (setf *current-menu* nil)
+               (click (elt (entries menu) (- it 1))))))
+         (setf event e)
+         (format output "Got key ~A~%" e)))
+      (gobject:g-signal-connect
+       items-list "row-activated"
+       (lambda (tree-view path column)
+         (declare (ignorable tree-view column))
+         (gtk:object-destroy *current-menu*)
+         (setf *current-menu* nil)
+         (click (elt (entries menu)
+                     (first (gtk:tree-path-indices path))))))
+      (gtk:widget-show window))))
 
 (defun select-from-list (m)
   (gtk:with-main-loop
