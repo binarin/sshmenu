@@ -191,3 +191,6 @@
          (let ((menu (read-menu (setting "menu-file"))))
            (click menu)))))))
 
+(defun run ()
+  (global-bind)
+  (gtk:join-gtk-main))

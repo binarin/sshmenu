@@ -1,3 +1,3 @@
 #!/bin/sh
-
-sbcl --eval "(require 'sshmenu)" --eval "(sb-ext:save-lisp-and-die \"/home/binarin/bin/sshmenu-cl\" :executable t :toplevel #'(lambda () (ru.binarin.sshmenu::click (ru.binarin.sshmenu::read-menu \"/home/binarin/.sshmenu-cl\"))))"
+cl-launch --no-include -s sshmenu -d `pwd`/sshmenu-image -v -f ~/.sbclrc
+cl-launch --no-include -m sshmenu-image -s sshmenu -v -f ~/.sbclrc -i '(ru.binarin.sshmenu:run)' -o sshmenu
