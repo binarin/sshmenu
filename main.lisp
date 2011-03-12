@@ -160,9 +160,7 @@
                         (<= 1 it (length (entries menu))))
                (gtk:object-destroy *current-menu*)
                (setf *current-menu* nil)
-               (click (elt (entries menu) (- it 1))))))
-         (setf event e)
-         (format output "Got key ~A~%" e)))
+               (click (elt (entries menu) (- it 1))))))))
       (gobject:g-signal-connect
        items-list "row-activated"
        (lambda (tree-view path column)
