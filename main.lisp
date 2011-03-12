@@ -89,7 +89,9 @@
 
 (defun read-menu (path)
   (with-open-file (f path)
-    (prepare-menu (read f))))
+    (prepare-menu
+     (let ((*package* (find-package :ru.binarin.sshmenu)))
+       (read f)))))
 
 (defun menu-entries-store (menu)
   (let ((model (make-instance 'gtk:array-list-store)))
