@@ -137,6 +137,48 @@
 (defvar output *standard-output*)
 (defvar event)
 
+
+(defun prepare-menu-view (menu click-fn)
+  (let* ((items-model (menu-entries-store menu))
+         (items-list (make-menu-view items-model)))
+    (gobject:g-signal-connect
+     items-list "key-press-event"
+     (lambda (w e)
+       (declare (ignorable w e))
+       (when (null (gdk:event-key-state e))
+         (awhen (parse-integer (gdk:event-key-string e) :junk-allowed t)
+           (when (and (<= 1 it 9)
+                      (<= 1 it (length (entries menu))))
+             (funcall click-fn menu (elt (entries menu) (- it 1))))))))
+    (gobject:g-signal-connect
+     items-list "row-activated"
+     (lambda (tree-view path column)
+       (declare (ignorable tree-view column))
+       (funcall click-fn menu
+                (elt (entries menu)
+                     (first (gtk:tree-path-indices path))))))
+    items-list))
+
+(defun make-quit-button ()
+  (let ((quit-button (make-instance 'gtk:button :label "Quit")))
+    (gobject:g-signal-connect
+     quit-button "clicked"
+     (lambda (w)
+       (declare (ignorable w))
+       (gtk:object-destroy *current-menu*)
+       (setf *current-menu* nil)
+       (gtk:gtk-main-quit)))
+    quit-button))
+
+(defun pack-main-container (items quit-button options-button)
+  (let* ((vbox (make-instance 'gtk:v-box))
+         (buttons-hbox (make-instance 'gtk:h-box :homogeneous t)))
+    (gtk:box-pack-start buttons-hbox options-button)
+    (gtk:box-pack-start buttons-hbox quit-button)
+    (gtk:box-pack-start vbox items)
+    (gtk:box-pack-start vbox buttons-hbox)
+    vbox))
+
 (defun make-selector-window (menu)
   (gtk:with-main-loop
     (let* ((window (make-instance 'gtk:gtk-window
@@ -145,45 +187,20 @@
                                   :default-width 10
                                   :default-height 10))
            (options-button (make-instance 'gtk:button :label "Options"))
-           (quit-button (make-instance 'gtk:button :label "Quit"))
-           (vbox (make-instance 'gtk:v-box))
-           (buttons-hbox (make-instance 'gtk:h-box :homogeneous t))
-           (items-model (menu-entries-store menu))
-           (items-list (make-menu-view items-model)))
+           (quit-button (make-quit-button))
+           (items-list
+            (prepare-menu-view
+             menu
+             (lambda (menu item)
+               (declare (ignore menu))
+               (gtk:object-destroy *current-menu*)
+               (setf *current-menu* nil)
+               (click item))))
+           (container (pack-main-container items-list quit-button options-button)))
       (when *current-menu*
         (gtk:object-destroy *current-menu*))
       (setf *current-menu* window)
-      (gtk:box-pack-start buttons-hbox options-button)
-      (gtk:box-pack-start buttons-hbox quit-button)
-      (gtk:box-pack-start vbox items-list)
-      (gtk:box-pack-start vbox buttons-hbox)
-      (gtk:container-add window vbox)
-      (gobject:g-signal-connect
-       quit-button "clicked"
-       (lambda (w)
-         (declare (ignorable w))
-         (gtk:object-destroy *current-menu*)
-         (setf *current-menu* nil)
-         (gtk:gtk-main-quit)))
-      (gobject:g-signal-connect
-       items-list "key-press-event"
-       (lambda (w e)
-         (declare (ignorable w e))
-         (when (null (gdk:event-key-state e))
-           (awhen (parse-integer (gdk:event-key-string e) :junk-allowed t)
-             (when (and (<= 1 it 9)
-                        (<= 1 it (length (entries menu))))
-               (gtk:object-destroy *current-menu*)
-               (setf *current-menu* nil)
-               (click (elt (entries menu) (- it 1))))))))
-      (gobject:g-signal-connect
-       items-list "row-activated"
-       (lambda (tree-view path column)
-         (declare (ignorable tree-view column))
-         (gtk:object-destroy *current-menu*)
-         (setf *current-menu* nil)
-         (click (elt (entries menu)
-                     (first (gtk:tree-path-indices path))))))
+      (gtk:container-add window container)
       (gtk:widget-show window))))
 
 (defun select-from-list (m)
