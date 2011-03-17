@@ -4,7 +4,8 @@
 
 (defun initialize-settings ()
   (setf (gethash "global-key" *settings*) "<Super>bracketright"
-        (gethash "menu-file" *settings*) #p"/home/binarin/.sshmenu-cl"))
+        (gethash "menu-file" *settings*) #p"/home/binarin/.sshmenu-cl"
+        (gethash "switch-to-desktop" *settings*) 0))
 
 (defun setting (name)
     (gethash name *settings*))

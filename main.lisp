@@ -64,22 +64,29 @@
                                  :wait t :input nil :output nil)))
     (= 0 (sb-ext:process-exit-code pid))))
 
+(defun switch-to-virtual-desktop ()
+  (awhen (setting "switch-to-desktop")
+    (sb-ext:run-program "/usr/bin/wmctrl" (list "-s" (format nil "~A" it))
+                        :wait nil :input nil :output nil)))
+
 (defmethod click ((l local-shell))
   (unless (raise-by-title (full-title l "|"))
     (let ((cmd (start-terminal-command (make-instance 'rxvt-terminal)
                                        (full-title l "|")
                                        '("screen" "-D" "-RR" "-h" "20000"
                                          "-S" "binarin"))))
-        (sb-ext:run-program (car cmd) (cdr cmd)
-                            :wait nil :input nil :output nil))))
+      (switch-to-virtual-desktop)
+      (sb-ext:run-program (car cmd) (cdr cmd)
+                          :wait nil :input nil :output nil))))
 
 (defmethod click ((r remote-shell))
   (unless (raise-by-title (full-title r "|"))
     (let ((cmd (shell-command r (terminal r)
                               (shell-command r (rsh r)
                                              (shell-command r (mux r) nil)))))
-        (sb-ext:run-program (car cmd) (cdr cmd)
-                            :wait nil :input nil :output nil))))
+      (switch-to-virtual-desktop)
+      (sb-ext:run-program (car cmd) (cdr cmd)
+                          :wait nil :input nil :output nil))))
 
 (defmethod click ((menu menu))
   (make-selector-window menu))
