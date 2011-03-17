@@ -115,7 +115,8 @@
     (iterate (for i from 1)
              (for entry in (entries menu))
              (gtk:store-add-item model
-                                 (list entry (format nil "~A" i))))
+                                 (list entry (string-downcase
+                                              (format nil "~36R" i)))))
     model))
 
 (defun make-menu-view (model)
@@ -144,7 +145,6 @@
 (defvar output *standard-output*)
 (defvar event)
 
-
 (defun prepare-menu-view (menu click-fn)
   (let* ((items-model (menu-entries-store menu))
          (items-list (make-menu-view items-model)))
@@ -153,10 +153,8 @@
      (lambda (w e)
        (declare (ignorable w e))
        (when (null (gdk:event-key-state e))
-         (awhen (parse-integer (gdk:event-key-string e) :junk-allowed t)
-           (when (and (<= 1 it 9)
-                      (<= 1 it (length (entries menu))))
-             (funcall click-fn menu (elt (entries menu) (- it 1))))))))
+         (awhen (key-to-item-position menu (gdk:event-key-string e))
+           (funcall click-fn menu (elt (entries menu) it))))))
     (gobject:g-signal-connect
      items-list "row-activated"
      (lambda (tree-view path column)
@@ -233,3 +231,9 @@
 (defun run ()
   (global-bind)
   (gtk:join-gtk-main))
+
+(defun key-to-item-position (menu key)
+  (awhen (parse-integer key :junk-allowed t :radix 36)
+    (when (and (<= 1 it 35)
+               (<= 1 it (length (entries menu))))
+      (- it 1))))
