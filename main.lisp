@@ -132,7 +132,7 @@
       (gtk:tree-view-column-add-attribute col cr "text" 1)
       (gtk:tree-view-append-column items-list col))
     (let ((col (make-instance 'gtk:tree-view-column :title "Submenu"))
-          (cr (make-instance 'gtk:cell-renderer-text)))
+          (cr (make-instance 'gtk:cell-renderer-text :xalign 1.0)))
       (gtk:tree-view-column-pack-start col cr)
       (gtk:tree-view-column-add-attribute col cr "text" 2)
       (gtk:tree-view-append-column items-list col))
