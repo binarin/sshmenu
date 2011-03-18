@@ -202,6 +202,17 @@
                (setf *current-menu* nil)
                (click item))))
            (container (pack-main-container items-list quit-button options-button)))
+      (gobject:g-signal-connect
+       items-list "key-press-event"
+       (lambda (w e)
+         (declare (ignorable w e))
+         (when (string-equal (format nil "~A" #\Esc)
+                             (gdk:event-key-string e))
+           (when *current-menu*
+             (gtk:object-destroy *current-menu*)
+             (setf *current-menu* window))
+           (when (parent menu)
+             (click (parent menu))))))
       (when *current-menu*
         (gtk:object-destroy *current-menu*))
       (setf *current-menu* window)
