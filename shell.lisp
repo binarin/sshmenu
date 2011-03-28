@@ -2,7 +2,8 @@
 
 (defclass shell (item)
   ((terminal :initarg :terminal :accessor terminal :initform (setting "default-terminal"))
-   (mux :initarg :mux :accessor mux :initform "default-mux")))
+   (mux :initarg :mux :accessor mux :initform "default-mux")
+   (tile :initarg :tile :accessor tile :initform nil)))
 
 (defmethod initialize-instance :after ((shell shell) &rest initargs &key &allow-other-keys)
   (declare (ignore initargs))
@@ -16,7 +17,6 @@
   ((host :initarg :host :accessor host)
    (login :initarg :login :accessor login)
    (bgcolor :initarg :bgcolor :accessor bgcolor)
-   (tile :initarg :tile :accessor tile)
    (rsh :initarg :rsh :accessor rsh :initform (setting "default-rsh"))))
 
 (defmethod visible-type ((item local-shell))
