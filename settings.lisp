@@ -9,7 +9,8 @@
         (gethash "default-terminal" *settings*) (make-instance 'rxvt-terminal)
         (gethash "default-mux" *settings*) (make-instance 'screen-mux :name "binarin")
         (gethash "screen-mux" *settings*) (make-instance 'screen-mux :name "binarin")
-        (gethash "tmux-mux" *settings*) (make-instance 'tmux-mux :name "binarin")))
+        (gethash "tmux-mux" *settings*) (make-instance 'tmux-mux :name "binarin")
+        (gethash "default-rsh" *settings*) (make-instance 'ssh-rsh)))
 
 (defun setting (name)
     (gethash name *settings*))

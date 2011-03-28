@@ -1,12 +1,13 @@
 (in-package :ru.binarin.sshmenu)
 
 (defclass shell (item)
-  ((mux :initarg :mux :accessor mux :initform (setting "default-mux"))
-   (terminal :initarg :terminal :accessor terminal :initform (setting "default-terminal"))))
+  ((terminal :initarg :terminal :accessor terminal :initform (setting "default-terminal"))
+   (mux :initarg :mux :accessor mux :initform "default-mux")))
 
 (defmethod initialize-instance :after ((shell shell) &rest initargs &key &allow-other-keys)
   (declare (ignore initargs))
-  (setf (mux shell) (setting (mux shell))))
+  (if (mux shell)
+      (setf (mux shell) (setting (mux shell)))))
 
 (defclass local-shell (shell)
   ())
@@ -16,9 +17,7 @@
    (login :initarg :login :accessor login)
    (bgcolor :initarg :bgcolor :accessor bgcolor)
    (tile :initarg :tile :accessor tile)
-   (terminal :initarg :terminal :accessor terminal :initform 'rxvt-unicode)
-   (rsh :initarg :rsh :accessor rsh :initform 'ssh)
-   (mux :initarg :mux :accessor mux :initform 'screen)))
+   (rsh :initarg :rsh :accessor rsh :initform (setting "default-rsh"))))
 
 (defmethod visible-type ((item local-shell))
   "LOCAL")
@@ -30,10 +29,4 @@
   (declare (ignore shell))
   nil)
 
-(defmethod start-command ((shell local-shell))
-  (start-terminal-command (terminal shell)
-                          (full-title shell "|")
-                          (aif (mux shell)
-                               (start-mux-command it
-                                                  (start-rsh-command (rsh shell)))
-                               (start-rsh-command (rsh shell)))))
+

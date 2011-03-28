@@ -12,20 +12,6 @@
                                     (while cur)
                                     (collect (title cur))))))))
 
-(defmethod shell-command ((r remote-shell) (term (eql 'rxvt-unicode)) args)
-  (declare (ignore term))
-  (list* "/usr/bin/rxvt-unicode"
-         "-pixmap" (concatenate 'string "/home/binarin/ssh/images/" (tile r) ";0x0+50+50:tile")
-         "-T" (full-title r "|") "-e" args))
-
-(defmethod shell-command ((r remote-shell) (rsh (eql 'ssh)) args)
-  (if args
-      (list* "ssh" "-l" (login r) (host r) "-t" args)
-      (list* "ssh" "-l" (login r) (host r))))
-
-(defmethod shell-command ((r remote-shell) (mux (eql 'screen)) args)
-  (list "screen" "-D" "-RR" "-h" "20000" "-S" "binarin"))
-
 (defun raise-by-title (title)
   (let ((pid (sb-ext:run-program "/usr/bin/wmctrl" (list "-F" "-a" title)
                                  :wait t :input nil :output nil)))
@@ -36,18 +22,9 @@
     (sb-ext:run-program "/usr/bin/wmctrl" (list "-s" (format nil "~A" it))
                         :wait nil :input nil :output nil)))
 
-(defmethod click ((l local-shell))
+(defmethod click ((l shell))
   (unless (raise-by-title (full-title l "|"))
     (let ((cmd (start-command (terminal l) l)))
-      (switch-to-virtual-desktop)
-      (sb-ext:run-program (car cmd) (cdr cmd)
-                          :wait nil :input nil :output nil))))
-
-(defmethod click ((r remote-shell))
-  (unless (raise-by-title (full-title r "|"))
-    (let ((cmd (shell-command r (terminal r)
-                              (shell-command r (rsh r)
-                                             (shell-command r (mux r) nil)))))
       (switch-to-virtual-desktop)
       (sb-ext:run-program (car cmd) (cdr cmd)
                           :wait nil :input nil :output nil))))
