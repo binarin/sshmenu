@@ -1,40 +1,7 @@
 (in-package :ru.binarin.sshmenu)
 
-(defclass item ()
-  ((title :initarg :title :reader title)
-   (parent :initarg :parent :reader parent :initform nil)))
-
-(defclass local-shell (item)
-  ())
-
-(defclass remote-shell (item)
-  ((host :initarg :host :accessor host)
-   (login :initarg :login :accessor login)
-   (bgcolor :initarg :bgcolor :accessor bgcolor)
-   (tile :initarg :tile :accessor tile)
-   (terminal :initarg :terminal :accessor terminal :initform 'rxvt-unicode)
-   (rsh :initarg :rsh :accessor rsh :initform 'ssh)
-   (mux :initarg :mux :accessor mux :initform 'screen)))
-
-(defclass menu (item)
-  ((entries :initarg :entries :accessor entries)
-   (defaults :initarg :defaults :accessor defaults)))
-
-(defmethod initialize-instance :after ((menu menu) &rest initargs &key &allow-other-keys)
-  (declare (ignore initargs))
-  (setf (entries menu) (mapcar (lambda (item) (apply 'make-instance item))
-                               (entries menu)))
-  (mapc #'(lambda (item) (setf (slot-value item 'parent) menu))
-        (entries menu)))
-
 (defmethod visible-type ((item item))
   (symbol-name (type-of item)))
-
-(defmethod visible-type ((item local-shell))
-  "LOCAL")
-
-(defmethod visible-type ((item remote-shell))
-  "SSH")
 
 (defmethod full-title ((i item) separator)
   "Возвращает полное имя элемента меню (начиная от корня)"
@@ -71,10 +38,7 @@
 
 (defmethod click ((l local-shell))
   (unless (raise-by-title (full-title l "|"))
-    (let ((cmd (start-terminal-command (make-instance 'rxvt-terminal)
-                                       (full-title l "|")
-                                       '("screen" "-D" "-RR" "-h" "20000"
-                                         "-S" "binarin"))))
+    (let ((cmd (start-command (terminal l) l)))
       (switch-to-virtual-desktop)
       (sb-ext:run-program (car cmd) (cdr cmd)
                           :wait nil :input nil :output nil))))

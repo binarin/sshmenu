@@ -12,6 +12,19 @@
 (defclass rxvt-terminal ()
   ((pixmap :initarg :pixmap :reader pixmap :initform nil)))
 
+;; shell: term - rsh - mux
+;; shell: term - rsh
+;; shell: term - mux
+;; shell: term
+
+(defmethod start-command ((term rxvt-terminal) (shell shell))
+  (list* "/usr/bin/rxvt-unicode"
+         "-T" (full-title shell "|")
+         (acond ((rsh shell) (list* "-e" (start-command it shell)))
+                ((mux shell) (list* "-e" (start-command it shell)))
+                (t '()))))
+
 (defmethod start-terminal-command ((rxvt rxvt-terminal) title nested-command)
   (list* "/usr/bin/rxvt-unicode"
          "-T" title "-e" nested-command))
+

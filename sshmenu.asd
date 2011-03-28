@@ -5,5 +5,8 @@
   :components
   ((:file "packages")
    (:file "terminal" :depends-on ("packages"))
-   (:file "settings" :depends-on ("packages"))
-   (:file "main" :depends-on ("packages" "terminal" "settings"))))
+   (:file "mux" :depends-on ("packages"))
+   (:file "menu" :depends-on ("packages"))
+   (:file "shell" :depends-on ("packages" "menu"))
+   (:file "settings" :depends-on ("packages" "mux" "terminal"))
+   (:file "main" :depends-on ("packages" "terminal" "settings" "mux"))))
