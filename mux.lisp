@@ -11,17 +11,12 @@
   ((name :initarg :name :reader mux-name)
    (exec-file :initarg :exec-file :reader exec-file :initform "/usr/bin/tmux")))
 
-(defmethod start-command ((mux screen-mux) (shell shell))
+(defmethod start-command ((mux screen-mux) shell)
   (list (exec-file mux) "-D" "-RR" "-h" "20000" "-S" (mux-name mux)))
 
-(defmethod start-command ((mux tmux-mux) (shell shell))
-;;  bash -c 'tmux attach -t binarin -d || tmux new -s binarin'
+(defmethod start-command ((mux tmux-mux) shell)
   (list "/bin/sh" "-c"
         (concatenate 'string
                      (exec-file mux)
                      " attach -t " (mux-name mux) " -d || "
                      (exec-file mux) " new -s " (mux-name mux))))
-
-
-
-

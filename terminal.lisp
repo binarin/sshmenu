@@ -17,7 +17,7 @@
 ;; shell: term - mux
 ;; shell: term
 
-(defmethod start-command ((term rxvt-terminal) (shell shell))
+(defmethod start-command ((term rxvt-terminal) shell)
   (list* "/usr/bin/rxvt-unicode"
          "-T" (full-title shell "|")
          (acond ((rsh shell) (list* "-e" (start-command it shell)))
