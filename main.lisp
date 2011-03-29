@@ -113,6 +113,7 @@
        (declare (ignorable w))
        (gtk:object-destroy *current-menu*)
        (setf *current-menu* nil)
+       (keybinder:unbind (setting "global-key"))
        (gtk:gtk-main-quit)))
     quit-button))
 
