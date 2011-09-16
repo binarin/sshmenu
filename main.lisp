@@ -57,7 +57,7 @@
              (for entry in (entries menu))
              (gtk:store-add-item model
                                  (list entry (string-downcase
-                                              (format nil "~36R" i)))))
+                                              (format nil "~36R" (+ i 9))))))
     model))
 
 (defun make-menu-view (model)
@@ -187,6 +187,6 @@
 
 (defun key-to-item-position (menu key)
   (awhen (parse-integer key :junk-allowed t :radix 36)
-    (when (and (<= 1 it 35)
-               (<= 1 it (length (entries menu))))
-      (- it 1))))
+    (when (and (<= 10 it 35)
+               (<= 1 (- it 9) (length (entries menu))))
+      (- it 10))))
