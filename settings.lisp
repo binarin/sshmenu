@@ -3,7 +3,7 @@
 (defparameter *settings* (make-hash-table :test 'equal))
 
 (defun initialize-settings ()
-  (setf (gethash "global-key" *settings*) "<Super>bracketright"
+  (setf (gethash "global-key" *settings*) "<Super>semicolon"
         (gethash "menu-file" *settings*) #p"/home/binarin/.sshmenu-cl"
         (gethash "pixmap-path" *settings*) "/home/binarin/ssh/images"
         (gethash "switch-to-desktop" *settings*) 0
