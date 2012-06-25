@@ -17,7 +17,12 @@
   ((host :initarg :host :accessor host)
    (login :initarg :login :accessor login)
    (bgcolor :initarg :bgcolor :accessor bgcolor)
-   (rsh :initarg :rsh :accessor rsh :initform (setting "default-rsh"))))
+   (rsh :initarg :rsh :accessor rsh :initform "default-rsh")))
+
+(defmethod initialize-instance :after ((shell remote-shell) &rest initargs &key &allow-other-keys)
+  (declare (ignore initargs))
+  (if (rsh shell)
+      (setf (rsh shell) (setting (rsh shell)))))
 
 (defmethod visible-type ((item local-shell))
   "LOCAL")

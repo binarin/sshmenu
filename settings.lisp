@@ -11,6 +11,8 @@
         (gethash "default-mux" *settings*) (make-instance 'screen-mux :name "binarin")
         (gethash "screen-mux" *settings*) (make-instance 'screen-mux :name "binarin")
         (gethash "tmux-mux" *settings*) (make-instance 'tmux-mux :name "binarin")
+        (gethash "mosh-rsh" *settings*) (make-instance 'mosh-rsh)
+        (gethash "ssh-rsh" *settings*) (make-instance 'ssh-rsh)
         (gethash "default-rsh" *settings*) (make-instance 'ssh-rsh)))
 
 (defun setting (name)
