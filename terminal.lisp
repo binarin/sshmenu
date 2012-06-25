@@ -11,7 +11,7 @@
    'list
    (list "/usr/bin/rxvt-unicode" "-T" (full-title shell "|"))
    (aif (tile shell)
-        (list "-pixmap" (concatenate 'string (setting "pixmap-path") "/" it ";0x0")))
+        (list "-pixmap" (concatenate 'string (setting "pixmap-path") "/" it ";0x0+0+0:op=tile")))
    (acond ((rsh shell) (list* "-e" (start-command it shell)))
           ((mux shell) (list* "-e" (start-command it shell)))
           (t '()))))
