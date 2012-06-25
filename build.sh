@@ -1,3 +1,1 @@
-#!/bin/sh
-cl-launch --no-include -s sshmenu -d `pwd`/sshmenu-image -v -f ~/.sbclrc
-cl-launch --no-include -m sshmenu-image -s sshmenu -v -f ~/.sbclrc -i '(ru.binarin.sshmenu:run)' -o sshmenu
+buildapp --output sshmenu --load ~/.sbclrc --load-system sshmenu  --eval '(defun main (args) (ru.binarin.sshmenu::global-bind) (gtk:join-gtk-main))'  --entry main
