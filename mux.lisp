@@ -17,6 +17,7 @@
 (defmethod start-command ((mux tmux-mux) shell)
   (list "/bin/sh" "-c"
         (concatenate 'string
+    	             "echo 1; "
                      (exec-file mux)
                      " attach -t " (mux-name mux) " -d || "
                      (exec-file mux) " new -s " (mux-name mux))))
