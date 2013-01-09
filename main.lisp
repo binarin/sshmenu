@@ -93,7 +93,9 @@
      items-list "key-press-event"
      (lambda (w e)
        (declare (ignorable w e))
-       (when (null (gdk:event-key-state e))
+       (when (not (find-if
+                   (lambda (x) (member x '(:control-mask)))
+                   (gdk:event-key-state e)))
          (awhen (key-to-item-position menu (gdk:event-key-string e))
            (funcall click-fn menu (elt (entries menu) it))))))
     (gobject:g-signal-connect
