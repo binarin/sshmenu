@@ -9,7 +9,7 @@
 
 (defclass tmux-mux (terminal-mux)
   ((name :initarg :name :reader mux-name)
-   (exec-file :initarg :exec-file :reader exec-file :initform "/usr/bin/tmux")))
+   (exec-file :initarg :exec-file :reader exec-file :initform "/usr/bin/tmux -2")))
 
 (defmethod start-command ((mux screen-mux) shell)
   (list (exec-file mux) "-D" "-RR" "-h" "20000" "-S" (mux-name mux)))
